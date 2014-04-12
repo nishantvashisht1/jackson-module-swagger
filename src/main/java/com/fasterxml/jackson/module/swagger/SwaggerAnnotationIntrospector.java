@@ -52,6 +52,16 @@ public class SwaggerAnnotationIntrospector
     }
 
     @Override
+    public Integer findPropertyIndex(Annotated a)
+    {
+    	ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
+        if (prop != null) {
+            return prop.position();
+        }
+        return null;
+    }
+    
+    @Override
     public List<NamedType> findSubtypes(Annotated a) {
     	return null;
     }
