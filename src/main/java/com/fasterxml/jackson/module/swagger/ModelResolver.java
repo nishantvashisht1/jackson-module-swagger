@@ -38,11 +38,13 @@ public class ModelResolver
 	
 	public Model resolve(JavaType type)
 	{
-		final Class<?> raw = type.getRawClass();
-		final BasicBeanDescription beanDesc = (BasicBeanDescription) _mapper.getSerializationConfig().introspect(type);
+		final BeanDescription beanDesc = _mapper.getSerializationConfig().introspect(type);
 		
 		Model model = new Model();
-		final String name = raw.getSimpleName();
+
+		// Couple of possibilities for defining
+		final String name = _typeName(type, beanDesc);
+
 		model.setId(name);
 		model.setName(name);
 		model.setQualifiedType(_typeQName(type));
@@ -139,15 +141,28 @@ public class ModelResolver
 		// also; with Swagger introspector's help, should get it from ApiModel/ApiModelProperty
 		return _intr.findPropertyDescription(ann);
 	}
-	
+
 	protected String _typeName(JavaType type) {
+		return _typeName(type, _mapper.getSerializationConfig().introspectClassAnnotations(type));
+	}
+
+	protected String _typeName(JavaType type, BeanDescription beanDesc)
+	{
+		PropertyName rootName = _intr.findRootName(beanDesc.getClassInfo());
+		if (rootName != null && !rootName.isEmpty()) {
+			return rootName.getSimpleName();
+		}
+		String full = type.getRawClass().getName();
+		if (full.indexOf('.') < 0) {
+			return full;
+		}
 		return type.getRawClass().getSimpleName();
 	}
 
 	protected String _typeQName(JavaType type) {
 		return type.getRawClass().getName();
 	}
-	
+
 	protected String _subTypeName(NamedType type)
 	{
 		// !!! TODO: should this use 'name' instead?
