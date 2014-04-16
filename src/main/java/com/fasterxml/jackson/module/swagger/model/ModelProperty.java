@@ -8,7 +8,7 @@ public class ModelProperty {
   private Integer position = null;
   private Boolean required = null;
   private String description = null;
-  private List<AllowableValues> allowableValues = new ArrayList<AllowableValues>();
+  private List<AllowableValue> allowableValues = new ArrayList<AllowableValue>();
   private ModelRef items = null;
   public String getType() {
     return type;
@@ -45,10 +45,10 @@ public class ModelProperty {
     this.description = description;
   }
 
-  public List<AllowableValues> getAllowableValues() {
+  public List<AllowableValue> getAllowableValues() {
     return allowableValues;
   }
-  public void setAllowableValues(List<AllowableValues> allowableValues) {
+  public void setAllowableValues(List<AllowableValue> allowableValues) {
     this.allowableValues = allowableValues;
   }
 
