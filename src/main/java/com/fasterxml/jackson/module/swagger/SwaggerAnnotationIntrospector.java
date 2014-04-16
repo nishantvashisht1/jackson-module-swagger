@@ -40,14 +40,14 @@ public class SwaggerAnnotationIntrospector
     @Override
     public String findPropertyDescription(Annotated a)
     {
-    	ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
-        if (prop != null) {
-            return prop.notes();
-        }
         ApiModel model = a.getAnnotation(ApiModel.class);
     	if (model != null) {
     		return model.description();
     	}
+    	ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
+        if (prop != null) {
+            return prop.notes();
+        }
         return null;
     }
 
