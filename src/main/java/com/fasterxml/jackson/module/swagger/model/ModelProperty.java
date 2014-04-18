@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class ModelProperty implements Comparable<ModelProperty>
 {
+  // same key in parent Model; not serialized
   private String name;
 	
   private String type = null;

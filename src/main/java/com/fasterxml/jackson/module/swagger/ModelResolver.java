@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.module.swagger;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.Version;
@@ -16,6 +17,14 @@ public class ModelResolver
     protected final ObjectMapper _mapper;
     protected final AnnotationIntrospector _intr;
 
+    protected TypeNameResolver _typeNameResolver = TypeNameResolver.std;
+
+    /**
+     * Minor optimization: no need to keep on resolving same types over and over
+     * again.
+     */
+    protected Map<JavaType, String> _resolvedTypeNames = new ConcurrentHashMap<JavaType, String>();
+    
     @SuppressWarnings("serial")
     public ModelResolver(ObjectMapper mapper) {
         mapper.registerModule(
@@ -150,30 +159,58 @@ public class ModelResolver
 		return _intr.findPropertyDescription(ann);
 	}
 
-	protected String _typeName(JavaType type) {
-		return _typeName(type, _mapper.getSerializationConfig().introspectClassAnnotations(type));
-	}
-
+     protected String _typeName(JavaType type) {
+         return _typeName(type, null);
+     }
+	
 	protected String _typeName(JavaType type, BeanDescription beanDesc)
 	{
-		PropertyName rootName = _intr.findRootName(beanDesc.getClassInfo());
-		if (rootName != null && !rootName.isEmpty()) {
-			return rootName.getSimpleName();
-		}
-		String full = type.getRawClass().getName();
-		if (full.indexOf('.') < 0) {
-			return full;
-		}
-		return type.getRawClass().getSimpleName();
+	    String name = _resolvedTypeNames.get(type);
+	    if (name != null) {
+	        return name;
+	    }
+	    name = _findTypeName(type, beanDesc);
+	    _resolvedTypeNames.put(type,  name);
+	    return name;
 	}
 
-	protected String _typeQName(JavaType type) {
-		return type.getRawClass().getName();
-	}
+    protected String _findTypeName(JavaType type, BeanDescription beanDesc)
+    {
+        // First, handle container types; they require recursion
+        if (type.isArrayType()) {
+            return "Array["+_typeName(type.getContentType())+"]";
+        }
+        if (type.isMapLikeType()) {
+            return "Map["
+                    +_typeName(type.getKeyType())
+                    +","
+                    +_typeName(type.getContentType())
+                    +"]";
+        }
+        if (type.isContainerType()) {
+            if (Set.class.isAssignableFrom(type.getRawClass())) {
+                return "Set["+_typeName(type.getContentType())+"]";
+            }
+            return "List["+_typeName(type.getContentType())+"]";
+        }
+        if (beanDesc == null) {
+            beanDesc = _mapper.getSerializationConfig().introspectClassAnnotations(type);
+        }
+	        
+        PropertyName rootName = _intr.findRootName(beanDesc.getClassInfo());
+        if (rootName != null && !rootName.isEmpty()) {
+            return rootName.getSimpleName();
+        }
+        return _typeNameResolver.nameForType(type);
+    }
 
-	protected String _subTypeName(NamedType type)
-	{
-		// !!! TODO: should this use 'name' instead?
-		return type.getType().getName();
-	}
+    protected String _typeQName(JavaType type) {
+        return type.getRawClass().getName();
+    }
+
+    protected String _subTypeName(NamedType type)
+    {
+        // !!! TODO: should this use 'name' instead?
+        return type.getType().getName();
+    }
 }

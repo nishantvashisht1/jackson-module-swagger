@@ -68,6 +68,10 @@ public class Model {
     this.subTypes = subTypes;
   }
 
+  public ModelProperty property(String name) {
+      return properties.get(name);
+  }
+  
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();

@@ -16,21 +16,21 @@ public class SwaggerAnnotationIntrospector
 
 	@Override
 	public Version version() {
-		return PackageVersion.VERSION;
+	    return PackageVersion.VERSION;
 	}
 
     @Override
     public boolean hasIgnoreMarker(AnnotatedMember m) {
-    	ApiModelProperty ann = m.getAnnotation(ApiModelProperty.class);
-    	if (ann != null && ann.hidden()) {
-    		return true;
-    	}
-    	return false;
+        ApiModelProperty ann = m.getAnnotation(ApiModelProperty.class);
+        if (ann != null && ann.hidden()) {
+    		    return true;
+        }
+        return false;
     }
 
     @Override
     public Boolean hasRequiredMarker(AnnotatedMember m) {
-    	ApiModelProperty ann = m.getAnnotation(ApiModelProperty.class);
+        ApiModelProperty ann = m.getAnnotation(ApiModelProperty.class);
         if (ann != null) {
             return ann.required();
         }
@@ -41,10 +41,10 @@ public class SwaggerAnnotationIntrospector
     public String findPropertyDescription(Annotated a)
     {
         ApiModel model = a.getAnnotation(ApiModel.class);
-    	if (model != null) {
-    		return model.description();
-    	}
-    	ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
+        if (model != null) {
+    		    return model.description();
+        }
+        ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
         if (prop != null) {
             return prop.notes();
         }
@@ -54,7 +54,7 @@ public class SwaggerAnnotationIntrospector
     @Override
     public Integer findPropertyIndex(Annotated a)
     {
-    	ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
+        ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
         if (prop != null) {
             return prop.position();
         }
@@ -63,11 +63,11 @@ public class SwaggerAnnotationIntrospector
     
     @Override
     public List<NamedType> findSubtypes(Annotated a) {
-    	return null;
+        return null;
     }
 
     @Override        
     public String findTypeName(AnnotatedClass ac) {
-    	return null;
+        return null;
     }
 }
