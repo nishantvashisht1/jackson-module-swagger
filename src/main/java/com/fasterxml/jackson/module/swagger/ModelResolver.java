@@ -1,7 +1,6 @@
 package com.fasterxml.jackson.module.swagger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.Version;
@@ -14,35 +13,34 @@ import com.wordnik.swagger.annotations.ApiModel;
 
 public class ModelResolver
 {
-	protected final ObjectMapper _mapper;
+    protected final ObjectMapper _mapper;
+    protected final AnnotationIntrospector _intr;
 
-	protected final AnnotationIntrospector _intr;
+    @SuppressWarnings("serial")
+    public ModelResolver(ObjectMapper mapper) {
+        mapper.registerModule(
+                new SimpleModule("swagger", Version.unknownVersion()) {
+                    @Override
+                    public void setupModule(SetupContext context) {
+                        context.insertAnnotationIntrospector(new SwaggerAnnotationIntrospector());
+                    }
+                }
+                );
+        _mapper = mapper;
+        _intr = mapper.getSerializationConfig().getAnnotationIntrospector();
+    }
 
-	@SuppressWarnings("serial")
-	public ModelResolver(ObjectMapper mapper) {
-		mapper.registerModule(
-				new SimpleModule("swagger", Version.unknownVersion()) {
-					@Override
-					public void setupModule(SetupContext context) {
-						context.insertAnnotationIntrospector(new SwaggerAnnotationIntrospector());
-					}
-				}
-		);
-		_mapper = mapper;
-		_intr = mapper.getSerializationConfig().getAnnotationIntrospector();
-	}
+    public Model resolve(Class<?> cls) {
+        return resolve(_mapper.constructType(cls));
+    }
 
-	public Model resolve(Class<?> cls) {
-		return resolve(_mapper.constructType(cls));
-	}
-	
-	public Model resolve(JavaType type)
-	{
-		final BeanDescription beanDesc = _mapper.getSerializationConfig().introspect(type);
+    public Model resolve(JavaType type)
+    {
+        final BeanDescription beanDesc = _mapper.getSerializationConfig().introspect(type);
 		
-		Model model = new Model();
+        Model model = new Model();
 
-		// Couple of possibilities for defining
+        // Couple of possibilities for defining
 		final String name = _typeName(type, beanDesc);
 
 		model.setId(name);
@@ -79,10 +77,11 @@ public class ModelResolver
 		if (!disc.isEmpty()) {
 			model.setDiscriminator(disc);
 		}
-		List<ModelProperty> modelProps = new ArrayList<ModelProperty>();
+		List<ModelProperty> props = new ArrayList<ModelProperty>();
 		for (BeanPropertyDefinition propDef : beanDesc.findProperties()) {
-			ModelProperty modelProp = new ModelProperty();
-			modelProps.add(modelProp);
+			String propName = propDef.getName();
+			ModelProperty modelProp = new ModelProperty(propName);
+			props.add(modelProp);
 			PropertyMetadata md = propDef.getMetadata();
 			final AnnotatedMember member = propDef.getPrimaryMember();
 			JavaType propType = member.getType(beanDesc.bindingsForBeanType());
@@ -104,23 +103,28 @@ public class ModelResolver
 				}
 			}
 		}
-		model.setProperties(modelProps);
-		return model;
-	}
+		Collections.sort(props);
+		Map<String,ModelProperty> modelProps = new LinkedHashMap<String,ModelProperty>();
+		for (ModelProperty prop : props) {
+			modelProps.put(prop.getName(), prop);
+        }
+        model.setProperties(modelProps);
+        return model;
+    }
 
-	protected ModelRef _modelRef(JavaType type)
-	{
-		ModelRef ref = new ModelRef();
-		ref.setType(_typeName(type));
-		ref.setQualifiedType(_typeQName(type));
-		// What does 'ref' property within 'ModelRef' mean?
-		return ref;
-	}
+    protected ModelRef _modelRef(JavaType type)
+    {
+        ModelRef ref = new ModelRef();
+        ref.setType(_typeName(type));
+        ref.setQualifiedType(_typeQName(type));
+        // What does 'ref' property within 'ModelRef' mean?
+        return ref;
+    }
 	
-	protected void _addEnumProps(BeanPropertyDefinition propDef, Class<?> propClass,
-		ModelProperty result)
-	{
-		final boolean useIndex =  _mapper.isEnabled(SerializationFeature.WRITE_ENUMS_USING_INDEX);
+    protected void _addEnumProps(BeanPropertyDefinition propDef, Class<?> propClass,
+            ModelProperty result)
+    {
+        final boolean useIndex =  _mapper.isEnabled(SerializationFeature.WRITE_ENUMS_USING_INDEX);
 		final boolean useToString = _mapper.isEnabled(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
 		List<AllowableValue> enums = new ArrayList<AllowableValue>();
 		@SuppressWarnings("unchecked")

@@ -6,8 +6,8 @@ public class Model {
   private String id = null;
   private String name = null;
   private String qualifiedType = null;
-  /* LinkedHashMap */
-  private List<ModelProperty> properties = new ArrayList<ModelProperty>();
+
+  private Map<String,ModelProperty> properties = new LinkedHashMap<String,ModelProperty>();
   private String description = null;
   private String baseModel = null;
   private String discriminator = null;
@@ -33,10 +33,10 @@ public class Model {
     this.qualifiedType = qualifiedType;
   }
 
-  public List<ModelProperty> getProperties() {
+  public Map<String,ModelProperty> getProperties() {
     return properties;
   }
-  public void setProperties(List<ModelProperty> properties) {
+  public void setProperties(Map<String,ModelProperty> properties) {
     this.properties = properties;
   }
 

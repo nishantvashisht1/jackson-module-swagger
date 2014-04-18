@@ -2,7 +2,12 @@ package com.fasterxml.jackson.module.swagger.model;
 
 import java.util.*;
 
-public class ModelProperty {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+public class ModelProperty implements Comparable<ModelProperty>
+{
+  private String name;
+	
   private String type = null;
   private String qualifiedType = null;
   private Integer position = null;
@@ -10,6 +15,15 @@ public class ModelProperty {
   private String description = null;
   private List<AllowableValue> allowableValues = new ArrayList<AllowableValue>();
   private ModelRef items = null;
+
+  public ModelProperty() { }
+  public ModelProperty(String name) {
+	  this.name = name;
+  }
+
+  @JsonIgnore
+  public String getName() { return name; }
+  
   public String getType() {
     return type;
   }
@@ -72,6 +86,25 @@ public class ModelProperty {
     sb.append("  items: ").append(items).append("\n");
     sb.append("}\n");
     return sb.toString();
+  }
+
+  /**
+   * Accessor used for sorting purposes.
+   */
+  public int sortingPosition() {
+	  if (position != null) {
+		  return position;
+	  }
+	  return Integer.MAX_VALUE;
+  }
+
+  @Override
+  public int compareTo(ModelProperty other) {
+      int i1 = sortingPosition();
+      int i2 = other.sortingPosition();
+      if (i1 < i2) return -1;
+      if (i1 > i2) return 1;
+      return 0;
   }
 }
 
