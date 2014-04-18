@@ -59,11 +59,14 @@ public class ModelResolver
 			}
 		}
 		
-		ArrayList<String> subtypeNames = new ArrayList<String>();
-		for (NamedType subtype : _intr.findSubtypes(beanDesc.getClassInfo())) {
-			subtypeNames.add(_subTypeName(subtype));
+		List<NamedType> nts = _intr.findSubtypes(beanDesc.getClassInfo());
+		if (nts != null) {
+			ArrayList<String> subtypeNames = new ArrayList<String>();
+			for (NamedType subtype : nts) {
+				subtypeNames.add(_subTypeName(subtype));
+			}
+			model.setSubTypes(subtypeNames);
 		}
-		model.setSubTypes(subtypeNames);
 
 		String disc = (apiModel == null) ? "" : apiModel.discriminator();
 		if (disc.isEmpty()) {
