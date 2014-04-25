@@ -28,13 +28,18 @@
     <packageVersion.package>${project.groupId}.swagger</packageVersion.package>
     <osgi.export>${project.groupId}.swagger.*;version=${project.version}
 </osgi.export>
-    <osgi.import>com.fasterxml.jackson.core
+    <osgi.import>com.fasterxml.jackson.annotation
+,com.fasterxml.jackson.core
 ,com.fasterxml.jackson.core.util
 ,com.fasterxml.jackson.databind
+,com.fasterxml.jackson.databind.introspect
+,com.fasterxml.jackson.databind.jsontype
 ,com.fasterxml.jackson.databind.module
+,com.fasterxml.jackson.databind.type
+,com.fasterxml.jackson.databind.util
+,com.wordnik.swagger.annotations
     </osgi.import>
   </properties>
-
   <dependencies>
     <!-- Extends Jackson databind, depends on swagger core -->
     <dependency>
