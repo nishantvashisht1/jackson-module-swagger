@@ -58,9 +58,9 @@ public class SimpleGenerationTest extends SwaggerTestBase
 			ModelProperty prop = entry.getValue();
 
 			if ("a".equals(name)) {
-			    assertEquals("String", prop.getType());
+			    assertEquals("string", prop.getType());
 			} else if ("b".equals(name)) {
-                   assertEquals("int", prop.getType());
+                   assertEquals("integer", prop.getType());
 			} else {
 				fail("Unknown property '"+name+"'");
 			}
