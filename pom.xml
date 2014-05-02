@@ -8,7 +8,7 @@
   </parent>
   <groupId>com.fasterxml.jackson.module</groupId>
   <artifactId>jackson-module-swagger</artifactId>
-  <version>0.5.0</version>
+  <version>0.5.1-SNAPSHOT</version>
   <name>Jackson-module-Swagger</name>
   <packaging>bundle</packaging>
   <description>Support for creating models for Swagger framework.
@@ -17,7 +17,7 @@
     <connection>scm:git:git@github.com:FasterXML/jackson-module-swagger.git</connection>
     <developerConnection>scm:git:git@github.com:FasterXML/jackson-module-swagger.git</developerConnection>
     <url>http://github.com/FasterXML/jackson-module-swagger</url>    
-    <tag>jackson-module-swagger-0.5.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
