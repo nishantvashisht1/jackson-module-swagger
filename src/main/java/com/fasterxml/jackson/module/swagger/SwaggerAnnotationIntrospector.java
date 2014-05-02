@@ -51,7 +51,11 @@ public class SwaggerAnnotationIntrospector
         return null;
     }
 
-    @Override
+    /* 01-May-2014, tatu: This is new method in 2.4; will mark as override
+     *   once we are able to depend on 2.4
+     */
+    
+//    @Override
     public Integer findPropertyIndex(Annotated a)
     {
         ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);

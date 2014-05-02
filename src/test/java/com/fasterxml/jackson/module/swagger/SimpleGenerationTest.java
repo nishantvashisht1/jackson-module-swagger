@@ -72,6 +72,10 @@ public class SimpleGenerationTest extends SwaggerTestBase
 		*/
 	}
 
+	/* 01-May-2014, tatu: Since property index, as well as support via AnnotationIntrospector
+	 *   is only in 2.4, this test can only be enabled once Jackson dep is upgraded.
+	 */
+	/*
      public void testOrdering() throws Exception
      {
          ObjectMapper mapper = new ObjectMapper();
@@ -90,8 +94,9 @@ public class SimpleGenerationTest extends SwaggerTestBase
          assertEquals(4, props.size());
          assertEquals("abcd", _concat(props.keySet()));
      }
+     */
 
-     private String _concat(Set<String> input) {
+	protected String _concat(Set<String> input) {
          StringBuilder sb = new StringBuilder();
          for (String str : input) {
              sb.append(str);
