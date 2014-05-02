@@ -139,23 +139,22 @@ public class ModelResolver
             ModelProperty result)
     {
         final boolean useIndex =  _mapper.isEnabled(SerializationFeature.WRITE_ENUMS_USING_INDEX);
-		final boolean useToString = _mapper.isEnabled(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
-		List<AllowableValue> enums = new ArrayList<AllowableValue>();
-		@SuppressWarnings("unchecked")
-		Class<Enum<?>> enumClass = (Class<Enum<?>>) propClass;
-		for (Enum<?> en : enumClass.getEnumConstants()) {
-			String n;
-			if (useIndex) {
-				n = String.valueOf(en.ordinal());
-			} else if (useToString) {
-				n = en.toString();
-			} else {
-				n = _intr.findEnumValue(en);
-			}
-			enums.add(new AllowableValue(n));
-		}
-		
-		result.setAllowableValues(enums);
+        final boolean useToString = _mapper.isEnabled(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
+        List<AllowableValue> enums = new ArrayList<AllowableValue>();
+        @SuppressWarnings("unchecked")
+        Class<Enum<?>> enumClass = (Class<Enum<?>>) propClass;
+        for (Enum<?> en : enumClass.getEnumConstants()) {
+            String n;
+            if (useIndex) {
+                n = String.valueOf(en.ordinal());
+            } else if (useToString) {
+                n = en.toString();
+            } else {
+                n = _intr.findEnumValue(en);
+            }
+            enums.add(new AllowableValue(n));
+        }
+        result.setAllowableValues(enums);
 	}
 
 	protected String _description(Annotated ann) {
