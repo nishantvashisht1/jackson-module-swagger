@@ -3,7 +3,7 @@ package com.fasterxml.jackson.module.swagger;
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.swagger.model.Model;
 import com.fasterxml.jackson.module.swagger.model.ModelProperty;
 import com.wordnik.swagger.annotations.ApiModel;
@@ -41,7 +41,7 @@ public class SimpleGenerationTest extends SwaggerTestBase
          public int b;
      }
 
-     public class TheCount {
+     static class TheCount {
          @JsonProperty("theCount")
          private Integer count;
 
@@ -52,6 +52,10 @@ public class SimpleGenerationTest extends SwaggerTestBase
          public Integer getCount() {
              return count;
          }
+     }
+
+     static class StringDateMapBean {
+         public Map<String,Date> stuff;
      }
 
      /*
@@ -124,8 +128,25 @@ public class SimpleGenerationTest extends SwaggerTestBase
  System.out.println("JSON: "+asJson);
  */
      }
-     
-	protected String _concat(Set<String> input) {
+
+     public void testStringDateMap() throws Exception
+     {
+         final ObjectMapper M = new ObjectMapper();
+         Model model = new ModelResolver(M)
+                 .resolve(StringDateMapBean.class);
+
+         Map<String,ModelProperty> props = model.getProperties();
+         assertEquals(1, props.size());
+         ModelProperty prop = props.values().iterator().next();
+         assertEquals("stuff", prop.getName());
+
+         /*
+         String asJson = M.writerWithDefaultPrettyPrinter().writeValueAsString(model);
+         System.out.println("JSON: "+asJson);
+         */
+     }
+
+     protected String _concat(Set<String> input) {
          StringBuilder sb = new StringBuilder();
          for (String str : input) {
              sb.append(str);
