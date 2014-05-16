@@ -27,6 +27,8 @@ public class ATMTest extends SwaggerTestBase
         Model model = new ModelResolver(mapper)
              .resolve(ATM.class);
         assertNotNull(model);
+
+//        System.out.println("ATM Model: "+model);    
     }
 }
 

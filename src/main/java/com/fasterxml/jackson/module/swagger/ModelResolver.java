@@ -39,6 +39,10 @@ public class ModelResolver
         _intr = mapper.getSerializationConfig().getAnnotationIntrospector();
     }
 
+    public ObjectMapper objectMapper() {
+        return _mapper;
+    }
+    
     public Model resolve(Class<?> cls) {
         return resolve(_mapper.constructType(cls));
     }
@@ -96,15 +100,10 @@ public class ModelResolver
 			JavaType propType = member.getType(beanDesc.bindingsForBeanType());
 			modelProp.setType(_typeName(propType));
 			modelProp.setQualifiedType(_typeQName(propType));
-			/* 01-May-2014, tatu: Following is 2.4-only, and we can not quite
-			 *   yet use it, as we only require Jackson 2.3.
-			 */
-			/*
 			Integer index = _intr.findPropertyIndex(member);
 			if (index != null) {
 				modelProp.setPosition(index);
 			}
-			*/
 			modelProp.setRequired(md.getRequired());
 
 			// And then properties specific to subset of property types:

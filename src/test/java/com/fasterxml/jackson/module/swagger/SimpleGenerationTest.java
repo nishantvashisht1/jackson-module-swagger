@@ -40,11 +40,29 @@ public class SimpleGenerationTest extends SwaggerTestBase
          @ApiModelProperty(position=2)
          public int b;
      }
-     
-	public void testSimple() throws Exception
+
+     public class TheCount {
+         @JsonProperty("theCount")
+         private Integer count;
+
+         public void setCount(Integer count) {
+             this.count = count;
+         }
+
+         public Integer getCount() {
+             return count;
+         }
+     }
+
+     /*
+     /**********************************************************
+     /* Test methods
+     /**********************************************************
+      */
+
+     public void testSimple() throws Exception
 	{
-		ObjectMapper mapper = new ObjectMapper();
-		Model model = new ModelResolver(mapper)
+		Model model = modelResolver()
 			.resolve(SimpleBean.class);
 		assertNotNull(model);
 
@@ -72,21 +90,16 @@ public class SimpleGenerationTest extends SwaggerTestBase
 		*/
 	}
 
-	/* 01-May-2014, tatu: Since property index, as well as support via AnnotationIntrospector
-	 *   is only in 2.4, this test can only be enabled once Jackson dep is upgraded.
-	 */
-	/*
      public void testOrdering() throws Exception
      {
-         ObjectMapper mapper = new ObjectMapper();
-         Model model = new ModelResolver(mapper)
+         Model model = modelResolver()
               .resolve(JsonOrderBean.class);
 
          Map<String,ModelProperty> props = model.getProperties();
          assertEquals(4, props.size());
          assertEquals("abcd", _concat(props.keySet()));
 
-         model = new ModelResolver(mapper).resolve(PositionBean.class);
+         model = modelResolver().resolve(PositionBean.class);
          props = model.getProperties();
          ModelProperty prop = props.get("c");
          assertNotNull(prop);
@@ -94,8 +107,24 @@ public class SimpleGenerationTest extends SwaggerTestBase
          assertEquals(4, props.size());
          assertEquals("abcd", _concat(props.keySet()));
      }
-     */
 
+     public void testTheCountBean() throws Exception
+     {
+         Model model = modelResolver()
+                 .resolve(TheCount.class);
+
+         Map<String,ModelProperty> props = model.getProperties();
+         assertEquals(1, props.size());
+         ModelProperty prop = props.values().iterator().next();
+
+         assertEquals("theCount", prop.getName());
+
+         /*
+ String asJson = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(model);
+ System.out.println("JSON: "+asJson);
+ */
+     }
+     
 	protected String _concat(Set<String> input) {
          StringBuilder sb = new StringBuilder();
          for (String str : input) {
