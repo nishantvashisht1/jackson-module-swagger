@@ -5,6 +5,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.swagger.model.Model;
 import com.fasterxml.jackson.module.swagger.model.ModelProperty;
+import com.fasterxml.jackson.module.swagger.model.ModelRef;
 
 public class ContainerTest extends SwaggerTestBase
 {
@@ -27,8 +28,13 @@ public class ContainerTest extends SwaggerTestBase
         ModelProperty prop = model.property("a");
         assertNotNull(prop);
         assertEquals("a", prop.getName());
-        assertEquals("Array[integer]", prop.getType());
+        assertEquals("Array", prop.getType());
         assertEquals("[I", prop.getQualifiedType());
+
+        ModelRef items = prop.getItems();
+        assertNotNull(items);
+        assertEquals("integer", items.getType());
+        assertEquals("int", items.getQualifiedType());
     }
 
     public void testArrays() throws Exception
@@ -42,7 +48,12 @@ public class ContainerTest extends SwaggerTestBase
         ModelProperty prop = model.property("stuff");
         assertNotNull(prop);
         assertEquals("stuff", prop.getName());
-        assertEquals("Map[integer,dateTime]", prop.getType());
+//        assertEquals("Map[integer,dateTime]", prop.getType());
+        assertEquals("Map", prop.getType());
         assertEquals("java.util.Map", prop.getQualifiedType());
+
+        ModelRef items = prop.getItems();
+        assertNotNull(items);
+        assertEquals("java.util.Calendar", items.getQualifiedType());
     }
 }

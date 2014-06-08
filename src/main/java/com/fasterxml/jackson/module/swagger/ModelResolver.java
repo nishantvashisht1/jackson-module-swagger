@@ -181,20 +181,26 @@ public class ModelResolver
     {
         // First, handle container types; they require recursion
         if (type.isArrayType()) {
-            return "Array["+_typeName(type.getContentType())+"]";
+//            return "Array["+_typeName(type.getContentType())+"]";
+            return "Array";
         }
         if (type.isMapLikeType()) {
+            /*
             return "Map["
                     +_typeName(type.getKeyType())
                     +","
                     +_typeName(type.getContentType())
                     +"]";
+                    */
+            return "Map";
         }
         if (type.isContainerType()) {
             if (Set.class.isAssignableFrom(type.getRawClass())) {
-                return "Set["+_typeName(type.getContentType())+"]";
+//                return "Set["+_typeName(type.getContentType())+"]";
+                return "Set";
             }
-            return "List["+_typeName(type.getContentType())+"]";
+//            return "List["+_typeName(type.getContentType())+"]";
+            return "List";
         }
         if (beanDesc == null) {
             beanDesc = _mapper.getSerializationConfig().introspectClassAnnotations(type);
