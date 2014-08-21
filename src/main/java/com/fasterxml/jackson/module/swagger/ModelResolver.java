@@ -47,6 +47,81 @@ public class ModelResolver {
   public ObjectMapper objectMapper() {
     return _mapper;
   }
+
+  public Property resolveProperty(Class<?> cls) {
+    return resolveProperty(_mapper.constructType(cls));
+  }
+
+  public Property resolveProperty(JavaType propType) {
+    Property property = null;
+
+    String typeName = _typeName(propType);
+
+    // primitive or null
+    property = getPrimitiveProperty(typeName);
+
+    // modelProp.setQualifiedType(_typeQName(propType));
+
+    // And then properties specific to subset of property types:
+    if (propType.isEnumType()) {
+      // _addEnumProps(propDef, propType.getRawClass(), modelProp);
+    } else if (propType.isContainerType()) {
+      JavaType keyType = propType.getKeyType();
+      JavaType valueType = propType.getContentType();
+
+      if(keyType != null && valueType != null) {
+        MapProperty mapProperty = new MapProperty();
+        Property innerType = getPrimitiveProperty(_typeName(valueType));
+        if(innerType == null) {
+          String propertyTypeName = _typeName(valueType);
+          Model innerModel = innerTypes.get(propertyTypeName);
+          if(innerModel == null)
+            innerModel = resolve(valueType);
+          if(innerModel != null) {
+            innerTypes.put(propertyTypeName, innerModel);
+            innerType = new RefProperty(propertyTypeName);
+            mapProperty.additionalProperties(innerType);
+            property = mapProperty;
+          }
+        }
+      }
+      else if(valueType != null) {
+        ArrayProperty arrayProperty = new ArrayProperty();
+        Property innerType = getPrimitiveProperty(_typeName(valueType));
+        if(innerType == null) {
+          String propertyTypeName = _typeName(valueType);
+          Model innerModel = innerTypes.get(propertyTypeName);
+          if(innerModel == null)
+            innerModel = resolve(valueType);
+          if(innerModel != null) {
+            innerTypes.put(propertyTypeName, innerModel);
+            innerType = new RefProperty(propertyTypeName);
+            arrayProperty.setItems(innerType);
+            property = arrayProperty;
+          }
+        }
+        else {
+          arrayProperty.setItems(innerType);
+          property = arrayProperty;
+        }
+      }
+    }
+
+    if(property == null) {
+      // complex type
+      String propertyTypeName = _typeName(propType);
+      Model innerModel = innerTypes.get(propertyTypeName);
+      if(innerModel == null) {
+        innerModel = resolve(propType);
+      }
+      if(innerModel != null) {
+        innerTypes.put(propertyTypeName, innerModel);
+        property = new RefProperty(propertyTypeName);
+      }
+    }
+
+    return property;
+  }
   
   public Model resolve(Class<?> cls) {
     return resolve(_mapper.constructType(cls));
@@ -108,83 +183,20 @@ public class ModelResolver {
       final AnnotatedMember member = propDef.getPrimaryMember();
       if(member != null) {
         JavaType propType = member.getType(beanDesc.bindingsForBeanType());
-
-        String typeName = _typeName(propType);
-
-        // primitive or null
-        property = getPrimitiveProperty(typeName);
-
-        // modelProp.setQualifiedType(_typeQName(propType));
-
-        // And then properties specific to subset of property types:
-        if (propType.isEnumType()) {
-          // _addEnumProps(propDef, propType.getRawClass(), modelProp);
-        } else if (propType.isContainerType()) {
-          JavaType keyType = propType.getKeyType();
-          JavaType valueType = propType.getContentType();
-
-          if(keyType != null && valueType != null) {
-            MapProperty mapProperty = new MapProperty();
-            Property innerType = getPrimitiveProperty(_typeName(valueType));
-            if(innerType == null) {
-              String propertyTypeName = _typeName(valueType);
-              Model innerModel = innerTypes.get(propertyTypeName);
-              if(innerModel == null)
-                innerModel = resolve(valueType);
-              if(innerModel != null) {
-                innerTypes.put(propertyTypeName, innerModel);
-                innerType = new RefProperty(propertyTypeName);
-                mapProperty.additionalProperties(innerType);
-                property = mapProperty;
-              }
-            }
-          }
-          else if(valueType != null) {
-            ArrayProperty arrayProperty = new ArrayProperty();
-            Property innerType = getPrimitiveProperty(_typeName(valueType));
-            if(innerType == null) {
-              String propertyTypeName = _typeName(valueType);
-              Model innerModel = innerTypes.get(propertyTypeName);
-              if(innerModel == null)
-                innerModel = resolve(valueType);
-              if(innerModel != null) {
-                innerTypes.put(propertyTypeName, innerModel);
-                innerType = new RefProperty(propertyTypeName);
-                arrayProperty.setItems(innerType);
-                property = arrayProperty;
-              }
-            }
-            else {
-              arrayProperty.setItems(innerType);
-              property = arrayProperty;
-            }
-          }
-        }
-
-        if(property == null) {
-          // complex type
-          String propertyTypeName = _typeName(propType);
-          Model innerModel = innerTypes.get(propertyTypeName);
-          if(innerModel == null) {
-            innerModel = resolve(propType);
-          }
-          if(innerModel != null) {
-            innerTypes.put(propertyTypeName, innerModel);
-            property = new RefProperty(propertyTypeName);
-          }
-        }
+        property = resolveProperty(propType);
 
         if(property != null) {
           property.setName(propName);
+
+          Boolean required = md.getRequired();
+          if(required != null)
+            property.setRequired(required);
+
 
           Integer index = _intr.findPropertyIndex(member);
           if (index != null) {
             property.setPosition(index);
           }
-          Boolean required = md.getRequired();
-          if(required != null)
-            property.setRequired(required);
-
           props.add(property);
           model.property(propName, property);
         }
