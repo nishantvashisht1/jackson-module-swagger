@@ -1,59 +1,69 @@
 package com.fasterxml.jackson.module.swagger;
 
-import java.util.Map;
+import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.swagger.model.Model;
-import com.fasterxml.jackson.module.swagger.model.ModelProperty;
-import com.fasterxml.jackson.module.swagger.model.ModelRef;
+import com.wordnik.swagger.models.*;
+import com.wordnik.swagger.models.properties.*;
 
-public class ContainerTest extends SwaggerTestBase
-{
-    static class ArrayBean {
-        public int[] a;
+public class ContainerTest extends SwaggerTestBase {
+  static class ArrayBean {
+    public int[] a;
+  }
+
+  static class MapBean {
+    public Map<Short, java.util.Calendar> stuff;
+  }
+
+  static class WrapperType {
+    public Map<String, InnerType> innerType;
+  }
+
+  public void testArray() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    Model model = new ModelResolver(mapper)
+      .resolve(ArrayBean.class);
+
+    Map<String, Property> props = model.getProperties();
+    assertEquals(1, props.size());
+    Property prop = props.get("a");
+    assertNotNull(prop);
+    assertEquals("array", prop.getType());
+//    assertEquals("[I", prop.getQualifiedType());
+
+    Property items = ((ArrayProperty)prop).getItems();
+    assertNotNull(items);
+    assertEquals("integer", items.getType());
+    // assertEquals("int", items.getQualifiedType());*/
+  }
+
+  public void testMap() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    Model model = new ModelResolver(mapper)
+       .resolve(MapBean.class);
+
+    Map<String, Property> props = model.getProperties();
+    assertEquals(1, props.size());
+    Property prop = props.get("stuff");
+    assertNotNull(prop);
+//    assertEquals("Map[integer,dateTime]", prop.getType());
+    // assertEquals("object", prop.getType());
+    // assertEquals("java.util.Map", prop.getQualifiedType());
+
+    // Property items = ((MapProperty)prop).getAdditionalProperties();
+    // assertNotNull(items);
+    // assertEquals("java.util.Calendar", items.getQualifiedType());
+  }
+
+  public void testComplexMap() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+
+    Map<String, InnerType> test = new HashMap<String, InnerType>();
+    ModelResolver resolver = new ModelResolver(mapper);
+    resolver.resolve(WrapperType.class);
+    Map<String, Model> types = resolver.getDetectedTypes();
+    for(String key: types.keySet()) {
+      Model model = types.get(key);
     }
-
-    static class MapBean {
-        public Map<Short, java.util.Calendar> stuff;
-    }
-
-    public void testArray() throws Exception
-    {
-        ObjectMapper mapper = new ObjectMapper();
-        Model model = new ModelResolver(mapper)
-             .resolve(ArrayBean.class);
-
-        Map<String,ModelProperty> props = model.getProperties();
-        assertEquals(1, props.size());
-        ModelProperty prop = model.property("a");
-        assertNotNull(prop);
-        assertEquals("a", prop.getName());
-        assertEquals("Array", prop.getType());
-        assertEquals("[I", prop.getQualifiedType());
-
-        ModelRef items = prop.getItems();
-        assertNotNull(items);
-        assertEquals("integer", items.getType());
-        assertEquals("int", items.getQualifiedType());
-    }
-
-    public void testArrays() throws Exception
-    {
-        ObjectMapper mapper = new ObjectMapper();
-        Model model = new ModelResolver(mapper)
-             .resolve(MapBean.class);
-
-        Map<String,ModelProperty> props = model.getProperties();
-        assertEquals(1, props.size());
-        ModelProperty prop = model.property("stuff");
-        assertNotNull(prop);
-        assertEquals("stuff", prop.getName());
-//        assertEquals("Map[integer,dateTime]", prop.getType());
-        assertEquals("Map", prop.getType());
-        assertEquals("java.util.Map", prop.getQualifiedType());
-
-        ModelRef items = prop.getItems();
-        assertNotNull(items);
-        assertEquals("java.util.Calendar", items.getQualifiedType());
-    }
+  }
 }
