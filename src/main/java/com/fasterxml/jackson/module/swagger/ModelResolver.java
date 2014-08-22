@@ -141,6 +141,7 @@ public class ModelResolver {
     processedInnerTypes.add(name);
 
     Model model = new Model()
+      .name(name)
       .description(_description(beanDesc.getClassInfo()))
       /*.setQualifiedType(_typeQName(type))*/;
 
@@ -192,10 +193,16 @@ public class ModelResolver {
           if(required != null)
             property.setRequired(required);
 
-
           Integer index = _intr.findPropertyIndex(member);
           if (index != null) {
             property.setPosition(index);
+          }
+
+          for(AnnotationIntrospector i: _intr.allIntrospectors()) {
+            if(i instanceof SwaggerAnnotationIntrospector) {
+              SwaggerAnnotationIntrospector swaggerAnnotationIntrospector = (SwaggerAnnotationIntrospector)i;
+              property.setExample(swaggerAnnotationIntrospector.findExampleValue(member));
+            }            
           }
           props.add(property);
           model.property(propName, property);
