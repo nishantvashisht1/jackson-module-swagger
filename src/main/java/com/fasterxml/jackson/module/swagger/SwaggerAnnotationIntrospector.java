@@ -1,13 +1,16 @@
 package com.fasterxml.jackson.module.swagger;
 
-import java.util.List;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.introspect.*;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.wordnik.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
+
+import javax.xml.bind.annotation.XmlElement;
+
+import java.util.List;
 
 public class SwaggerAnnotationIntrospector extends AnnotationIntrospector {
   private static final long serialVersionUID = 1L;
@@ -32,6 +35,10 @@ public class SwaggerAnnotationIntrospector extends AnnotationIntrospector {
     if (ann != null) {
       return ann.required();
     }
+    XmlElement elem = m.getAnnotation(XmlElement.class);
+    if (elem != null)
+      if(elem.required())
+        return true;
     return null;
   }
 
