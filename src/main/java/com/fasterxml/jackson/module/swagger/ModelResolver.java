@@ -140,7 +140,7 @@ public class ModelResolver {
     // avoid recursion on failures
     processedInnerTypes.add(name);
 
-    Model model = new Model()
+    ModelImpl model = new ModelImpl()
       .name(name)
       .description(_description(beanDesc.getClassInfo()))
       /*.setQualifiedType(_typeQName(type))*/;
