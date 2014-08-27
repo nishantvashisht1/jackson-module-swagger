@@ -11,7 +11,7 @@ import com.wordnik.swagger.annotations.*;
 import org.junit.Ignore;
 
 public class SimpleGenerationTest extends SwaggerTestBase {
-  ObjectMapper mapper = new ObjectMapper();
+//  ObjectMapper mapper = new ObjectMapper();
 
   @JsonPropertyOrder({ "a", "b" })
   @ApiModel(description="DESC")

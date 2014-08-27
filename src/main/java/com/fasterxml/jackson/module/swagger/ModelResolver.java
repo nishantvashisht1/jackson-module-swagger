@@ -323,7 +323,8 @@ public class ModelResolver {
   // TODO remove this
   static Comparator<Property> getPropertyComparator() {
     return new Comparator<Property>() {
-      public int compare(Property one, Property two) {
+      @Override
+    public int compare(Property one, Property two) {
         if(one.getPosition() == null)
           return -1;
         else if (two.getPosition() == null)
