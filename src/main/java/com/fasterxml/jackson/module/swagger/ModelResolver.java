@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.wordnik.swagger.models.*;
 import com.wordnik.swagger.models.properties.*;
 import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 public class ModelResolver {
   protected final ObjectMapper _mapper;
@@ -197,13 +198,7 @@ public class ModelResolver {
           if (index != null) {
             property.setPosition(index);
           }
-
-          for(AnnotationIntrospector i: _intr.allIntrospectors()) {
-            if(i instanceof SwaggerAnnotationIntrospector) {
-              SwaggerAnnotationIntrospector swaggerAnnotationIntrospector = (SwaggerAnnotationIntrospector)i;
-              property.setExample(swaggerAnnotationIntrospector.findExampleValue(member));
-            }            
-          }
+          property.setExample(_findExampleValue(member));
           props.add(property);
           model.property(propName, property);
         }
@@ -320,6 +315,16 @@ public class ModelResolver {
     return type.getType().getName();
   }
 
+  protected String _findExampleValue(Annotated a) {
+      ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
+      if (prop != null) {
+          if (!prop.example().isEmpty()) {
+              return prop.example();
+          }
+      }
+      return null;
+    }
+  
   // TODO remove this
   static Comparator<Property> getPropertyComparator() {
     return new Comparator<Property>() {

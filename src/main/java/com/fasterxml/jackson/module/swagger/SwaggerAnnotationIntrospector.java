@@ -64,14 +64,6 @@ public class SwaggerAnnotationIntrospector extends AnnotationIntrospector {
     }
     return null;
   }
-
-  public String findExampleValue(Annotated a) {
-    ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
-    if (prop != null) {
-      return "".equals(prop.example()) ? null : prop.example();
-    }
-    return null;
-  }
   
   @Override
   public List<NamedType> findSubtypes(Annotated a) {
