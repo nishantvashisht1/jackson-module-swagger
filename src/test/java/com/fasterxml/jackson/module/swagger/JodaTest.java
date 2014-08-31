@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.joda.time.DateTime;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wordnik.swagger.models.*;
 import com.wordnik.swagger.models.properties.*;
 import com.wordnik.swagger.annotations.ApiModelProperty;

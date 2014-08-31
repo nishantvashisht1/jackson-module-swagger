@@ -58,12 +58,14 @@ public class ContainerTest extends SwaggerTestBase {
   public void testComplexMap() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
 
-    Map<String, InnerType> test = new HashMap<String, InnerType>();
+//    Map<String, InnerType> test = new HashMap<String, InnerType>();
     ModelResolver resolver = new ModelResolver(mapper);
     resolver.resolve(WrapperType.class);
     Map<String, Model> types = resolver.getDetectedTypes();
     for(String key: types.keySet()) {
       Model model = types.get(key);
+      assertNotNull(model);
+      // !!! TODO: verify
     }
   }
 }

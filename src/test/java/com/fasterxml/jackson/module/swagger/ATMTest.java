@@ -2,7 +2,6 @@ package com.fasterxml.jackson.module.swagger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wordnik.swagger.models.*;
-import com.wordnik.swagger.models.properties.*;
 
 public class ATMTest extends SwaggerTestBase {
   static class ATM {
@@ -23,8 +22,8 @@ public class ATMTest extends SwaggerTestBase {
     ObjectMapper mapper = new ObjectMapper();
     Model model = new ModelResolver(mapper)
        .resolve(ATM.class);
-    /*
     assertNotNull(model);
+    /*
     prettyPrint(model);
     */
   }
