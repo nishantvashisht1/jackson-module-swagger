@@ -219,6 +219,9 @@ public class ModelResolver {
 
   protected Property getPrimitiveProperty(String typeName) {
     Property property = null;
+    if("boolean".equals(typeName)) {
+      property = new BooleanProperty();
+    }
     if("string".equals(typeName)) {
       property = new StringProperty();
     }
