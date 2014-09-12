@@ -2,7 +2,6 @@ package com.fasterxml.jackson.module.swagger;
 
 import java.util.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wordnik.swagger.models.*;
 import com.wordnik.swagger.models.properties.*;
 
@@ -20,8 +19,7 @@ public class ContainerTest extends SwaggerTestBase {
   }
 
   public void testArray() throws Exception {
-    ObjectMapper mapper = new ObjectMapper();
-    Model model = new ModelResolver(mapper)
+    Model model = new ModelResolver(mapper())
       .resolve(ArrayBean.class);
 
     Map<String, Property> props = model.getProperties();
@@ -38,8 +36,7 @@ public class ContainerTest extends SwaggerTestBase {
   }
 
   public void testMap() throws Exception {
-    ObjectMapper mapper = new ObjectMapper();
-    Model model = new ModelResolver(mapper)
+    Model model = new ModelResolver(mapper())
        .resolve(MapBean.class);
 
     Map<String, Property> props = model.getProperties();
@@ -56,10 +53,8 @@ public class ContainerTest extends SwaggerTestBase {
   }
 
   public void testComplexMap() throws Exception {
-    ObjectMapper mapper = new ObjectMapper();
-
 //    Map<String, InnerType> test = new HashMap<String, InnerType>();
-    ModelResolver resolver = new ModelResolver(mapper);
+    ModelResolver resolver = new ModelResolver(mapper());
     resolver.resolve(WrapperType.class);
     Map<String, Model> types = resolver.getDetectedTypes();
     for(String key: types.keySet()) {

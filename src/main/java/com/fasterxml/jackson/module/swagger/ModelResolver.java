@@ -206,7 +206,7 @@ public class ModelResolver {
     }
 
     // TODO: not working with the comparator
-    Collections.sort(props, ModelResolver.getPropertyComparator());
+    Collections.sort(props, getPropertyComparator());
     Map<String, Property> modelProps = new LinkedHashMap<String, Property>();
     for (Property prop : props) {
       modelProps.put(prop.getName(), prop);
@@ -332,13 +332,12 @@ public class ModelResolver {
   static Comparator<Property> getPropertyComparator() {
     return new Comparator<Property>() {
       @Override
-    public int compare(Property one, Property two) {
-        if(one.getPosition() == null)
+      public int compare(Property one, Property two) {
+        if (one.getPosition() == null)
           return -1;
-        else if (two.getPosition() == null)
+        if (two.getPosition() == null)
           return 1;
-        else 
-          return one.getPosition().compareTo(two.getPosition());
+        return one.getPosition().compareTo(two.getPosition());
       }
     };
   }

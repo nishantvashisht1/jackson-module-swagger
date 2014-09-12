@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.module.swagger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wordnik.swagger.models.*;
 
 public class ATMTest extends SwaggerTestBase {
@@ -19,8 +18,7 @@ public class ATMTest extends SwaggerTestBase {
   public enum Currency { USA, CANADA }
 
   public void testATMModel() throws Exception {
-    ObjectMapper mapper = new ObjectMapper();
-    Model model = new ModelResolver(mapper)
+    Model model = new ModelResolver(mapper())
        .resolve(ATM.class);
     assertNotNull(model);
     /*

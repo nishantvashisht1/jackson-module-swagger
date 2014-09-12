@@ -63,6 +63,11 @@ public class SimpleGenerationTest extends SwaggerTestBase {
     public Map<String,Date> stuff;
   }
 
+  @JsonPropertyOrder({ "a", "b" })
+  static class IntArrayBean {
+    public int[] b;
+  }
+  
   /*
   /**********************************************************
   /* Test methods
@@ -150,6 +155,18 @@ public class SimpleGenerationTest extends SwaggerTestBase {
     assertEquals("stuff", prop.getName());
   }
 
+  public void testIntArray() throws Exception {
+      Model model = new ModelResolver(new ObjectMapper())
+        .resolve(IntArrayBean.class);
+
+      Map<String, Property> props = model.getProperties();
+      assertEquals(1, props.size());
+      Property prop = props.values().iterator().next();
+      assertEquals("b", prop.getName());
+      
+      // !!! TODO
+  }
+  
   protected String _concat(Set<String> input) {
     StringBuilder sb = new StringBuilder();
     for (String str : input) {
