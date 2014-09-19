@@ -85,6 +85,10 @@ public class ModelResolver {
             property = mapProperty;
           }
         }
+        else {
+          mapProperty.additionalProperties(innerType);
+          property = mapProperty;
+        }
       }
       else if(valueType != null) {
         ArrayProperty arrayProperty = new ArrayProperty();
