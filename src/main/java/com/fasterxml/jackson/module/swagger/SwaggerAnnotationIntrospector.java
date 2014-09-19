@@ -46,7 +46,7 @@ public class SwaggerAnnotationIntrospector extends AnnotationIntrospector {
   public String findPropertyDescription(Annotated a)
   {
     ApiModel model = a.getAnnotation(ApiModel.class);
-    if (model != null) {
+    if (model != null && !"".equals(model.description())) {
       return model.description();
     }
     ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
