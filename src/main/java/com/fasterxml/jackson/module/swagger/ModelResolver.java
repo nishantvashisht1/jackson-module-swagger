@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.introspect.*;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.type.MapType;
 import com.wordnik.swagger.models.*;
 import com.wordnik.swagger.models.properties.*;
 import com.wordnik.swagger.annotations.ApiModel;
@@ -62,7 +63,6 @@ public class ModelResolver {
     property = getPrimitiveProperty(typeName);
 
     // modelProp.setQualifiedType(_typeQName(propType));
-
     // And then properties specific to subset of property types:
     if (propType.isEnumType()) {
       // _addEnumProps(propDef, propType.getRawClass(), modelProp);
@@ -79,10 +79,18 @@ public class ModelResolver {
           if(innerModel == null)
             innerModel = resolve(valueType);
           if(innerModel != null) {
-            innerTypes.put(propertyTypeName, innerModel);
-            innerType = new RefProperty(propertyTypeName);
-            mapProperty.additionalProperties(innerType);
-            property = mapProperty;
+            if(!"Object".equals(propertyTypeName)) {
+              innerTypes.put(propertyTypeName, innerModel);
+              innerType = new RefProperty(propertyTypeName);
+              mapProperty.additionalProperties(innerType);
+              property = mapProperty;
+            }
+            else {
+              innerTypes.put(propertyTypeName, innerModel);
+              innerType = new StringProperty();
+              mapProperty.additionalProperties(innerType);
+              property = mapProperty;
+            }
           }
         }
         else {
@@ -137,6 +145,13 @@ public class ModelResolver {
     
     // Couple of possibilities for defining
     final String name = _typeName(type, beanDesc);
+    if("Object".equals(name)) {
+	    return new ModelImpl();
+    }
+    
+    if(type.isMapLikeType()) {
+      return null;
+    }
 
     // if processed already, return it or return null
     if(processedInnerTypes.contains(name))
@@ -147,24 +162,15 @@ public class ModelResolver {
 
     ModelImpl model = new ModelImpl()
       .name(name)
-      .description(_description(beanDesc.getClassInfo()))
-      /*.setQualifiedType(_typeQName(type))*/;
+      .description(_description(beanDesc.getClassInfo()));
 
     ApiModel apiModel = beanDesc.getClassAnnotations().get(ApiModel.class);
+    // TODO
     if (apiModel != null) {
       Class<?> parent = apiModel.parent();
       if (parent != Void.class) {
         // model.setBaseModel(_typeName(_mapper.constructType(parent)));
       }
-    }
-
-    List<NamedType> nts = _intr.findSubtypes(beanDesc.getClassInfo());
-    if (nts != null) {
-      ArrayList<String> subtypeNames = new ArrayList<String>();
-      for (NamedType subtype : nts) {
-        // subtypeNames.add(_subTypeName(subtype));
-      }
-      // model.setSubTypes(subtypeNames);
     }
 
     String disc = (apiModel == null) ? "" : apiModel.discriminator();
@@ -176,7 +182,7 @@ public class ModelResolver {
       }
     }
     if (!disc.isEmpty()) {
-      // model.setDiscriminator(disc);
+      model.setDiscriminator(disc);
     }
 
     List<Property> props = new ArrayList<Property>();
@@ -198,6 +204,10 @@ public class ModelResolver {
           if(required != null)
             property.setRequired(required);
 
+          String description = _intr.findPropertyDescription(member);
+          if(description != null && !"".equals(description))
+            property.setDescription(description);
+
           Integer index = _intr.findPropertyIndex(member);
           if (index != null) {
             property.setPosition(index);
@@ -205,6 +215,33 @@ public class ModelResolver {
           property.setExample(_findExampleValue(member));
           props.add(property);
           model.property(propName, property);
+        }
+      }
+    }
+
+
+    List<NamedType> nts = _intr.findSubtypes(beanDesc.getClassInfo());
+    if (nts != null) {
+      ArrayList<String> subtypeNames = new ArrayList<String>();
+      for (NamedType subtype : nts) {
+        Model subtypeModel = resolve(subtype.getType());
+
+        if(subtypeModel instanceof ModelImpl && subtypeModel != null) {
+          ModelImpl impl = (ModelImpl) subtypeModel;
+
+          // remove shared properties defined in the parent
+          if(model.getProperties() != null) {
+            for(String propertyName : model.getProperties().keySet()) {
+              if(impl.getProperties().containsKey(propertyName)) {
+                impl.getProperties().remove(propertyName);
+              }
+            }
+          }
+
+          impl.setDiscriminator(null);
+          innerTypes.put(impl.getName(), new ComposedModel()
+            .parent(new RefModel(name))
+            .child(impl));
         }
       }
     }
@@ -323,15 +360,15 @@ public class ModelResolver {
   }
 
   protected String _findExampleValue(Annotated a) {
-      ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
-      if (prop != null) {
-          if (!prop.example().isEmpty()) {
-              return prop.example();
-          }
+    ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
+    if (prop != null) {
+      if (!prop.example().isEmpty()) {
+        return prop.example();
       }
-      return null;
     }
-  
+    return null;
+  }
+
   // TODO remove this
   static Comparator<Property> getPropertyComparator() {
     return new Comparator<Property>() {
