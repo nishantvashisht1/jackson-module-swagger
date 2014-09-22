@@ -51,7 +51,7 @@ public class SwaggerAnnotationIntrospector extends AnnotationIntrospector {
     }
     ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
     if (prop != null) {
-      return prop.notes();
+      return prop.value();
     }
     return null;
   }
@@ -59,7 +59,7 @@ public class SwaggerAnnotationIntrospector extends AnnotationIntrospector {
   @Override
   public Integer findPropertyIndex(Annotated a) {
     ApiModelProperty prop = a.getAnnotation(ApiModelProperty.class);
-    if (prop != null) {
+    if (prop != null && prop.position() != 0) {
       return prop.position();
     }
     return null;
