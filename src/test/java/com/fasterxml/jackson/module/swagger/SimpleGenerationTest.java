@@ -74,9 +74,9 @@ public class SimpleGenerationTest extends SwaggerTestBase {
   /**********************************************************
    */
 
-  public void testSimple() throws Exception  {
+  public void shouldResolvePropertiesMaintainingDeclaredOrder() throws Exception {
     Model model = modelResolver()
-      .resolve(SimpleBean.class);
+            .resolve(SimpleBean.class);
     assertNotNull(model);
 
     assertEquals("DESC", model.getDescription());
@@ -84,31 +84,41 @@ public class SimpleGenerationTest extends SwaggerTestBase {
     Map<String, Property> props = model.getProperties();
     assertEquals(6, props.size());
 
-    for (Map.Entry<String, Property> entry : props.entrySet()) {
-      String name = entry.getKey();
-      Property prop = entry.getValue();
+    List<Property> properties = new ArrayList<Property>(props.values());
 
-      if ("a".equals(name)) {
-        assertEquals("string", prop.getType());
-      } else if ("b".equals(name)) {
-        assertEquals("integer", prop.getType());
-        assertEquals("int32", prop.getFormat());
-      } else if ("c".equals(name)) {
-        assertEquals("integer", prop.getType());
-        assertEquals("int64", prop.getFormat());
-      } else if ("d".equals(name)) {
-        assertEquals("number", prop.getType());
-        assertEquals("float", prop.getFormat());
-      } else if ("e".equals(name)) {
-        assertEquals("number", prop.getType());
-        assertEquals("double", prop.getFormat());
-      } else if ("f".equals(name)) {
-        assertEquals("string", prop.getType());
-        assertEquals("date-time", prop.getFormat());
-      } else {
-        fail("Unknown property '"+name+"'");
-      }
-    }
+    Property a = properties.get(0);
+    assertPropertyName("a", a);
+    assertEquals("string", a.getType());
+
+    Property b = properties.get(1);
+    assertPropertyName("b", b);
+    assertEquals("a", a.getName());
+    assertEquals("integer", b.getType());
+    assertEquals("int32", b.getFormat());
+
+    Property c = properties.get(2);
+    assertPropertyName("c", c);
+    assertEquals("integer", c.getType());
+    assertEquals("int64", c.getFormat());
+
+    Property d = properties.get(3);
+    assertPropertyName("d", d);
+    assertEquals("number", d.getType());
+    assertEquals("float", d.getFormat());
+
+    Property e = properties.get(4);
+    assertPropertyName("e", e);
+    assertEquals("number", e.getType());
+    assertEquals("double", e.getFormat());
+
+    Property f = properties.get(5);
+    assertPropertyName("f", f);
+    assertEquals("string", f.getType());
+    assertEquals("date-time", f.getFormat());
+  }
+
+  private void assertPropertyName(String name, Property property) {
+    assertEquals(name, property.getName());
   }
 
   @Ignore
