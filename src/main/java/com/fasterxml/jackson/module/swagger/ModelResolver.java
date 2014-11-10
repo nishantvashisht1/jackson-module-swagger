@@ -20,7 +20,7 @@ public class ModelResolver {
   protected final AnnotationIntrospector _intr;
 
   protected TypeNameResolver _typeNameResolver = TypeNameResolver.std;
-  protected Map<String, Model> innerTypes = new HashMap<String, Model>();
+  protected Map<String, Model> innerTypes = new LinkedHashMap<String, Model>();
   protected Set<String> processedInnerTypes = new HashSet<String>();
 
   /**
