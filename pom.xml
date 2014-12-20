@@ -4,11 +4,11 @@
   <parent>
     <groupId>com.fasterxml.jackson</groupId>
     <artifactId>jackson-parent</artifactId>
-    <version>2.4</version>
+    <version>2.5-rc1</version>
   </parent>
   <groupId>com.fasterxml.jackson.module</groupId>
   <artifactId>jackson-module-swagger</artifactId>
-  <version>0.5.1-SNAPSHOT</version>
+  <version>2.5.0-SNAPSHOT</version>
   <name>Jackson-module-Swagger</name>
   <packaging>bundle</packaging>
   <description>Support for creating models for Swagger framework.
@@ -21,7 +21,7 @@
   </scm>
 
   <properties>
-    <version.jackson.core>2.4.2</version.jackson.core>
+    <version.jackson.core>2.5.0-rc1</version.jackson.core>
     <version.swagger>1.5.0-SNAPSHOT</version.swagger>
     <!-- Generate PackageVersion.java into this directory. -->
     <packageVersion.dir>com/fasterxml/jackson/module/swagger</packageVersion.dir>
