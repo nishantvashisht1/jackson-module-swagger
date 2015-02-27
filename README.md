@@ -4,4 +4,6 @@ to produce Swagger model instances.
 
 ## Status
 
+[![Build Status](https://travis-ci.org/FasterXML/jackson-module-swagger.svg)](https://travis-ci.org/FasterXML/jackson-module-swagger)
+
 Work in progress.
